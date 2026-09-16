@@ -1,6 +1,6 @@
 name: release
 
-# Tag v* -> build, attest (Sigstore), publish to PyPI (OIDC trusted
+# Tag v* -> build, SBOM, attest (Sigstore), publish to PyPI (OIDC trusted
 # publishing — configure the publisher on PyPI once) and npm (--provenance),
 # then attach everything to a GitHub Release.
 on:
@@ -8,12 +8,15 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 jobs:
   pypi:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # gh release create
+      id-token: write      # PyPI OIDC + Sigstore signing
+      attestations: write  # attest-build-provenance
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -23,7 +26,24 @@ jobs:
         run: |
           pip install build==1.2.2
           python -m build
-      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+      - name: SBOM (CycloneDX, stdlib-generated — no third-party deps to list)
+        run: |
+          python3 - <<'EOF'
+          import json, tomllib
+          meta = tomllib.load(open("pyproject.toml", "rb"))["project"]
+          sbom = {
+              "bomFormat": "CycloneDX", "specVersion": "1.5", "version": 1,
+              "metadata": {"component": {
+                  "type": "library", "name": meta["name"],
+                  "version": meta["version"],
+                  "licenses": [{"license": {"id": "MIT"}}],
+                  "purl": f"pkg:pypi/{meta['name']}@{meta['version']}"}},
+              "components": [],
+          }
+          json.dump(sbom, open("dist/sbom.cdx.json", "w"), indent=2)
+          print("sbom: stdlib-only project, zero third-party components")
+          EOF
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
@@ -35,7 +55,12 @@ jobs:
             --title "${GITHUB_REF_NAME}" --notes-from-tag
 
   npm:
+    # Skipped until NPM_TOKEN is configured (Settings -> Secrets -> Actions).
+    if: ${{ secrets.NPM_TOKEN != '' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # npm provenance
     defaults:
       run:
         working-directory: npm

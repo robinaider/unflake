@@ -22,9 +22,10 @@ push to main). Badge: `https://api.scorecard.dev/projects/github.com/robinaider/
 
 ## Needs clicks, not code (do after creating the repo)
 
-1. **Branch protection** (Settings → Branches → Add rule for `main`):
-   require PR before merging, require 1 approval, require status checks
-   (`ci`, `codeql`), dismiss stale approvals, block force pushes + deletions.
+1. **Branch protection** — ✅ live via API (ruleset `main`): PR + 1 approval +
+   status checks + dismiss-stale + thread resolution, force-push/deletion
+   blocks. Solo-maintainer note: admin bypass is on for velocity until
+   contributor #2, so reviewer tiers above Tier 1 are aspirational, not earned.
 2. **Private vulnerability reporting** (Settings → Security → enable).
 3. **Tag protection** for `v*` (Settings → Tags) once releases flow.
 4. **CII Best Practices badge** (bestpractices.coreinfrastructure.org) — apply

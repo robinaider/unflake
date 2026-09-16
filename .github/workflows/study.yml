@@ -8,14 +8,17 @@ on:
     - cron: "17 3 * * *"
   workflow_dispatch:
 
-# Minimal token: read the repo, upload study artifacts.
+# Minimal token at top level; artifact upload needs actions:write,
+# scoped to the job that uploads.
 permissions:
   contents: read
-  actions: write
 
 jobs:
   hunt:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write  # upload-artifact only
     strategy:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
