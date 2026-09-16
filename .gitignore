@@ -16,3 +16,6 @@ benchmarks/study_v2/results/
 benchmarks/study_v2/__pycache__/
 .tmp/
 .study-work/
+# profile/pfp art - keep local only, never commit (per owner request)
+assets/profile-banner.svg
+assets/showcase-detailed.svg
