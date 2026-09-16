@@ -55,7 +55,7 @@ without a test failing.
 ## Known limitations (good first issues — file them at launch)
 
 1. Variable-host local servers (see above): needs runtime/server-config hints.
-2. JS/TS string-literal awareness (Python done via `tokenize`).
+2. ~~JS/TS string-literal awareness~~ — shipped: hand-rolled scanner (`'...'`/`"..."`/`` `...` `` minus `${}` interpolation, regex-vs-division heuristic, broken files stay visible). Comments still scanned (conservative, like Python).
 3. Two runs can't distinguish regression from flake — by design, documented.
 
 ## Verdict checks (unit-tested in `tests/test_unflake.py`)

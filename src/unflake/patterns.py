@@ -142,6 +142,16 @@ DEFAULT_EXCLUDES = (".git", "node_modules", "__pycache__", ".venv", "venv",
                     "dist", "build", ".tox", ".pytest_cache", ".eggs", "*.egg-info")
 
 
+def _literal_spans(suffix: str, text: str) -> dict[int, list[tuple[int, int]]]:
+    """String-literal spans per scanner: tokenize for Python, hand-rolled
+    for JS/TS. Anything else yields {} (no skipping — never hide signal)."""
+    if suffix == ".py":
+        return _string_spans(text)
+    if suffix in JS_EXTS:
+        return _js_string_spans(text)
+    return {}
+
+
 def _string_spans(text: str) -> dict[int, list[tuple[int, int]]]:
     """Map 1-based lineno -> string-literal column spans, via stdlib tokenize.
 
@@ -168,6 +178,225 @@ def _in_literal(spans: dict[int, list[tuple[int, int]]],
     return any(a <= start and end <= b for a, b in spans.get(lineno, []))
 
 
+_JS_ID = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$")
+
+
+def _scan_js_regex(text: str, i: int, n: int) -> int:
+    """End index (exclusive) of a regex starting at text[i]=='/', or -1.
+
+    Honors backslash escapes and [/]-classes. A literal newline aborts:
+    JS regexes cannot span lines, so that '/' was division, not a literal.
+    """
+    j = i + 1
+    in_class = False
+    while j < n:
+        c = text[j]
+        if c == "\n":
+            return -1
+        if c == "\\":
+            j += 2
+            continue
+        if c == "[":
+            in_class = True
+        elif c == "]":
+            in_class = False
+        elif c == "/" and not in_class:
+            return j + 1
+        j += 1
+    return -1
+
+
+def _js_string_spans(text: str) -> dict[int, list[tuple[int, int]]]:
+    """Map 1-based lineno -> JS string-literal column spans (hand scanner).
+
+    Covers '...', "..." and `...` minus ${} interpolations, which ARE
+    executed code and stay visible. Knows // and /* */ comments so quotes
+    inside them don't confuse it. Comments themselves are NOT skipped
+    (conservative, like Python: only literals hide matches).
+
+    Regex literals use the standard prev-token heuristic (value before '/'
+    means division). When unsure we assume division — a missed skip only
+    costs precision, never hides signal. Broken files degrade to visible.
+    """
+    spans: dict[int, list[tuple[int, int]]] = {}
+    n = len(text)
+
+    def add_span(sline: int, scol: int, eline: int, ecol: int) -> None:
+        if eline < sline or (eline == sline and ecol <= scol):
+            return
+        if sline == eline:
+            spans.setdefault(sline, []).append((scol, ecol))
+            return
+        spans.setdefault(sline, []).append((scol, 10 ** 9))
+        for r in range(sline + 1, eline):
+            spans.setdefault(r, []).append((0, 10 ** 9))
+        spans.setdefault(eline, []).append((0, ecol))
+
+    # Frames: ("str", quote, sline, scol) | ("tpl", sline, scol)
+    #         ("expr", depth) | ("lcomment",) | ("bcomment",)
+    stack: list[tuple] = []
+    prev_val = False  # last significant token was a value (=> '/' divides)
+    i, line, col = 0, 1, 0
+
+    while i < n:
+        ch = text[i]
+        nxt = text[i + 1] if i + 1 < n else ""
+        top = stack[-1] if stack else None
+        kind = top[0] if top else None
+
+        if ch == "\n":
+            if kind == "str":
+                _, _, sl, sc = stack.pop()  # unterminated: end tolerantly
+                add_span(sl, sc, line, col)
+                prev_val = False
+            elif kind == "lcomment":
+                stack.pop()
+            i += 1
+            line += 1
+            col = 0
+            continue
+
+        if kind == "lcomment":
+            i += 1
+            col += 1
+            continue
+        if kind == "bcomment":
+            if ch == "*" and nxt == "/":
+                stack.pop()
+                i += 2
+                col += 2
+            else:
+                i += 1
+                col += 1
+            continue
+        if kind == "str":
+            _, q, sl, sc = top
+            if ch == "\\":
+                i += 2
+                col += 2
+                continue
+            if ch == q:
+                stack.pop()
+                add_span(sl, sc, line, col + 1)
+                prev_val = True
+                i += 1
+                col += 1
+                continue
+            i += 1
+            col += 1
+            continue
+        if kind == "tpl":
+            _, sl, sc = top
+            if ch == "\\":
+                i += 2
+                col += 2
+                continue
+            if ch == "`":
+                stack.pop()
+                add_span(sl, sc, line, col + 1)
+                prev_val = True
+                i += 1
+                col += 1
+                continue
+            if ch == "$" and nxt == "{":
+                stack.pop()
+                add_span(sl, sc, line, col)
+                stack.append(("expr", 1))
+                prev_val = False
+                i += 2
+                col += 2
+                continue
+            i += 1
+            col += 1
+            continue
+
+        # Code context (top is None or an ("expr", depth) frame).
+        if kind == "expr" and ch == "{":
+            stack[-1] = ("expr", top[1] + 1)
+            prev_val = False
+            i += 1
+            col += 1
+            continue
+        if kind == "expr" and ch == "}":
+            if top[1] == 1:
+                stack.pop()
+                stack.append(("tpl", line, col + 1))  # fresh text segment
+            else:
+                stack[-1] = ("expr", top[1] - 1)
+            prev_val = False
+            i += 1
+            col += 1
+            continue
+        if ch in " \t\r\f\v":
+            i += 1
+            col += 1
+            continue
+        if ch == "/" and nxt == "/":
+            stack.append(("lcomment",))
+            i += 2
+            col += 2
+            continue
+        if ch == "/" and nxt == "*":
+            stack.append(("bcomment",))
+            i += 2
+            col += 2
+            continue
+        if ch in "\"'":
+            stack.append(("str", ch, line, col))
+            prev_val = False
+            i += 1
+            col += 1
+            continue
+        if ch == "`":
+            stack.append(("tpl", line, col))
+            prev_val = False
+            i += 1
+            col += 1
+            continue
+        if ch == "/":
+            if prev_val:
+                prev_val = False  # division
+                i += 1
+                col += 1
+                continue
+            end = _scan_js_regex(text, i, n)
+            if end == -1:
+                prev_val = False
+                i += 1
+                col += 1
+                continue
+            while i < end:  # skip the literal, tracking lines (no \n inside)
+                i += 1
+                col += 1
+            prev_val = True
+            continue
+        if ch in _JS_ID:
+            while i < n and text[i] in _JS_ID:
+                i += 1
+                col += 1
+            prev_val = True
+            continue
+        if ch in ")]":
+            prev_val = True
+            i += 1
+            col += 1
+            continue
+        prev_val = False
+        i += 1
+        col += 1
+
+    # EOF: flush unterminated literals tolerantly (still literal-ish text).
+    for fr in stack:
+        if fr[0] == "str":
+            _, _, sl, sc = fr
+            add_span(sl, sc, line, col)
+        elif fr[0] == "tpl":
+            _, sl, sc = fr
+            add_span(sl, sc, line, col)
+    return spans
+
+
 def _strip_code_fences(lines: list[str]) -> list[bool]:
     """Return mask: True if the line is live code (not inside a markdown fence)."""
     live = []
@@ -192,7 +421,7 @@ def scan_file(path: str | Path) -> list[Finding]:
     lines = text.splitlines()
     live = _strip_code_fences(lines) if path.suffix == ".md" else [True] * len(lines)
     is_test = _is_test_file(path)
-    literals = _string_spans(text) if path.suffix == ".py" else {}
+    literals = _literal_spans(path.suffix, text)
     findings: list[Finding] = []
     for rule in RULES:
         if rule.test_files_only and not is_test:

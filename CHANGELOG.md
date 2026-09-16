@@ -1,5 +1,9 @@
 # Changelog — all notable changes, newest first.
 
+## [Unreleased]
+### Added
+- JS/TS string-literal awareness: hand-rolled scanner strips `'...'`/`"..."`/`` `...` `` (minus live `${}` interpolation) before rule matching, with a regex-vs-division heuristic. Comments stay scanned (conservative). Broken files never hide. 7 new `TestJsLiterals` tests; JS fixture counts unchanged.
+
 ## [0.6.1] — scorecard hardening
 ### Added
 - OpenSSF Scorecard push: SHA-pinned Actions, minimal tokens, injection-free

@@ -366,5 +366,66 @@ class TestJsRunnerFixtures(unittest.TestCase):
         self.assertIn("flaky counter", flaky[0].id)
 
 
+class TestJsLiterals(unittest.TestCase):
+    def _scan_text(self, name: str, content: str):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / name
+            f.write_text(content)
+            return scan_file(f)
+
+    def test_strings_hide_js_patterns(self):
+        got = self._scan_text(
+            "login.spec.ts",
+            'const a = "cy.wait(5000)";\n'
+            "const b = 'waitForTimeout(1)';\n"
+            "await login(); cy.wait(300);\n")
+        self.assertEqual([(f.rule, f.line) for f in got], [("FLK009", 3)])
+
+    def test_template_text_hidden_interpolation_live(self):
+        hidden = self._scan_text(
+            "login.spec.ts",
+            "const m = `retry cy.wait(500) done`;\n")
+        self.assertEqual([f.rule for f in hidden], [])
+        live = self._scan_text(
+            "login.spec.ts",
+            "await x(`t${cy.wait(400)}`);\n")
+        self.assertEqual([f.rule for f in live], ["FLK009"])
+
+    def test_slashes_in_strings_and_regex(self):
+        got = self._scan_text(
+            "login.spec.ts",
+            'const u = "http://x/fetch("; // a URL, not a call\n'
+            "const re = /a\\/\\/b/;\n"
+            "cy.wait(100);\n")
+        self.assertEqual([(f.rule, f.line) for f in got], [("FLK009", 3)])
+
+    def test_division_does_not_break_strings(self):
+        got = self._scan_text(
+            "calc.spec.ts",
+            "const q = total / count;\n"
+            'const s = "cy.wait(9)";\n')
+        self.assertEqual([f.rule for f in got], [])
+
+    def test_multiline_template_hidden(self):
+        got = self._scan_text(
+            "login.spec.ts",
+            "const t = `\n"
+            "  waitForTimeout(2000)\n"
+            "`;\n")
+        self.assertEqual([f.rule for f in got], [])
+
+    def test_broken_js_never_hides(self):
+        got = self._scan_text(
+            "login.spec.ts",
+            'const s = "oops;\n'
+            "cy.wait(10);\n")
+        self.assertIn("FLK009", {f.rule for f in got})
+
+    def test_comments_still_scanned(self):
+        # Conservative like Python: only literals hide, comments stay visible.
+        got = self._scan_text("login.spec.ts", "// cy.wait(5)\n")
+        self.assertEqual([f.rule for f in got], ["FLK009"])
+
+
 if __name__ == "__main__":
     unittest.main()
