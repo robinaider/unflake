@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite name="pytest" tests="4" errors="0" failures="1" skipped="0">
+  <testcase classname="test_cart" name="test_total" time="2.1" />
+  <testcase classname="test_cart" name="test_discount" time="1.2"><failure message="assert 19 &gt;= 20">flaky discount</failure></testcase>
+  <testcase classname="test_cart" name="test_checkout" time="0.4" />
+  <testcase classname="test_math" name="test_add" time="0.01" />
+</testsuite>

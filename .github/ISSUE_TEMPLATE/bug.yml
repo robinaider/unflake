@@ -1,0 +1,30 @@
+name: Bug report
+description: Something reproduces wrong — a number, a verdict, a crash
+title: "[bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What reproduces wrong
+      description: One command plus expected vs actual (see benchmarks/BENCH.md for the honesty bar).
+      placeholder: |
+        unflake analyze run1.xml run2.xml
+        expected: FLAKY foo | actual: stable-pass
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Repro
+      description: Smallest fixture that triggers it (paste or link).
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Unflake version
+      description: Output of `unflake --version`.
+      placeholder: 0.6.0
+    validations:
+      required: true

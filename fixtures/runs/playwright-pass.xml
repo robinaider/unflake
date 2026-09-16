@@ -1,0 +1,8 @@
+<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="0.52991">
+<testsuite name="tests/flaky.spec.js" timestamp="2026-09-12T05:49:25.081Z" hostname="" tests="2" failures="0" skipped="0" time="0.07" errors="0">
+<testcase name="stable title" classname="tests/flaky.spec.js" time="0.069">
+</testcase>
+<testcase name="flaky counter" classname="tests/flaky.spec.js" time="0.001">
+</testcase>
+</testsuite>
+</testsuites>

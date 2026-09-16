@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="392" viewBox="0 0 780 392" font-family="ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace" font-size="14">
+  <rect width="780" height="392" rx="10" fill="#0d1117"/>
+  <rect width="780" height="38" rx="10" fill="#161b22"/>
+  <rect y="28" width="780" height="10" fill="#161b22"/>
+  <circle cx="28" cy="19" r="6" fill="#ff5f57"/>
+  <circle cx="48" cy="19" r="6" fill="#febc2e"/>
+  <circle cx="68" cy="19" r="6" fill="#28c840"/>
+  <text x="96" y="24" fill="#8b949e" font-size="13">dev — unflake in 60 seconds</text>
+  <g>
+    <text x="24" y="66"><tspan fill="#7ee787">$ </tspan><tspan fill="#e6edf3">pip install unflake</tspan></text>
+    <text x="24" y="88" fill="#8b949e">Successfully installed unflake-0.6.0</text>
+    <text x="24" y="116"><tspan fill="#7ee787">$ </tspan><tspan fill="#e6edf3">unflake scan tests/</tspan></text>
+    <text x="24" y="138"><tspan fill="#d29922">WARNING [FLK001]</tspan><tspan fill="#e6edf3"> tests/test_shop.py:4 — time.sleep() in tests</tspan></text>
+    <text x="24" y="160"><tspan fill="#d29922">WARNING [FLK004]</tspan><tspan fill="#e6edf3"> tests/test_shop.py:5 — real network calls, no mocks</tspan></text>
+    <text x="24" y="188"><tspan fill="#7ee787">$ </tspan><tspan fill="#e6edf3">unflake run --runs 3 -- pytest tests/ -q</tspan></text>
+    <text x="24" y="210"><tspan fill="#7ee787">FlakeScore: 50.0/100</tspan><tspan fill="#e6edf3"> (2 flaky of 4 tests)</tspan></text>
+    <text x="24" y="232"><tspan fill="#ffa657">  FLAKY test_cart::test_checkout</tspan><tspan fill="#8b949e"> (2P/1F over 3 runs)</tspan></text>
+    <text x="24" y="260"><tspan fill="#7ee787">$ </tspan><tspan fill="#e6edf3">unflake quarantine run1.xml run2.xml --framework pytest</tspan></text>
+    <text x="24" y="282" fill="#e6edf3">pytest -k "not test_checkout and not test_discount"</text>
+    <text x="24" y="304" fill="#8b949e"># gating stays green — quarantined tests still run nightly</text>
+    <text x="24" y="340"><tspan fill="#7ee787">$ </tspan><tspan fill="#e6edf3">unflake init --framework pytest --write</tspan></text>
+    <text x="24" y="362" fill="#8b949e">tests/conftest.py: created. Rerun any failure with UNFLAKE_SEED=&lt;seed&gt;.</text>
+  </g>
+</svg>

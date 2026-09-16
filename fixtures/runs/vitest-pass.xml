@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="0.004759043">
+    <testsuite name="tests/add.test.js" timestamp="2026-09-12T05:45:57.728Z" hostname="lanman" tests="1" failures="0" errors="0" skipped="0" time="0.002556876">
+        <testcase classname="tests/add.test.js" name="adds" time="0.001480285">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/flaky.test.js" timestamp="2026-09-12T05:45:57.729Z" hostname="lanman" tests="2" failures="0" errors="0" skipped="0" time="0.002202167">
+        <testcase classname="tests/flaky.test.js" name="stable" time="0.001161223">
+        </testcase>
+        <testcase classname="tests/flaky.test.js" name="flaky counter" time="0.000211936">
+        </testcase>
+    </testsuite>
+</testsuites>

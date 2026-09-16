@@ -1,0 +1,8 @@
+{
+  "name": "unflake",
+  "version": "0.6.1",
+  "description": "Green CI without the rerun ritual — detect, score, and quarantine flaky tests",
+  "author": "Unflake Contributors",
+  "license": "MIT",
+  "skills": "./skills/"
+}

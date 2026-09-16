@@ -1,0 +1,29 @@
+name: New FLK rule
+description: Propose a flake anti-pattern detector (best first issue)
+title: "[rule] FLK0XX: "
+labels: ["good first issue"]
+body:
+  - type: textarea
+    id: pattern
+    attributes:
+      label: Pattern
+      description: Regex or description, plus two real-world examples (links welcome).
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it flakes
+      description: One paragraph — timing, randomness, network, order, or environment?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+      description: What should the `fix:` line tell the user?
+  - type: textarea
+    id: fp
+    attributes:
+      label: False-positive check
+      description: What legitimate code could match, and how do we exclude it? (Copy the style of tests/test_unflake.py — one positive plus one negative test.)

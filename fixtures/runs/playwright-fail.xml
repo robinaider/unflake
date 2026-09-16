@@ -1,0 +1,32 @@
+<testsuites id="" name="" tests="2" failures="1" skipped="0" errors="0" time="0.503816">
+<testsuite name="tests/flaky.spec.js" timestamp="2026-09-12T05:49:25.944Z" hostname="" tests="2" failures="1" skipped="0" time="0.08" errors="0">
+<testcase name="stable title" classname="tests/flaky.spec.js" time="0.078">
+</testcase>
+<testcase name="flaky counter" classname="tests/flaky.spec.js" time="0.002">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../proj/test-results/tests-flaky-flaky-counter/error-context.md]]
+]]>
+</system-out>
+<failure message="expect(received).toBe(expected) // Object.is equality" type="expect.toBe">
+<![CDATA[  tests/flaky.spec.js:18:1 › flaky counter ─────────────────────────────────────────────────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      17 |
+      18 | test('flaky counter', async () => {
+    > 19 |   expect(n() % 2).toBe(1);
+         |                   ^
+      20 | });
+      21 |
+        at /tmp/pw/proj/tests/flaky.spec.js:19:19
+
+    Error Context: test-results/tests-flaky-flaky-counter/error-context.md
+]]>
+</failure>
+</testcase>
+</testsuite>
+</testsuites>

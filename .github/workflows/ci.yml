@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+# Minimal token: this workflow only reads the repo.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Unit tests (stdlib only)
+        run: python3 -m unittest discover -s tests -v
+      - name: End-to-end proof on real pytest
+        run: |
+          pip install pytest==8.3.5
+          python3 -m unittest tests.test_e2e -v
+      - name: Install package + entry point
+        run: |
+          pip install -e .
+          unflake --version
+          unflake scan examples/ --fail-on warning || test $? -eq 1
+      - name: Dogfood — unflake scans itself (fail on error)
+        run: unflake scan src tests examples --fail-on error
+      - name: Dogfood — analyze fixture runs
+        run: unflake analyze fixtures/runs/run1.xml fixtures/runs/run2.xml fixtures/runs/run3.xml

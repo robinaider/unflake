@@ -1,0 +1,24 @@
+name: New adapter / emitter
+description: Support another harness (skill adapter) or test framework (quarantine)
+title: "[adapter] "
+labels: ["good first issue"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: Harness (skill adapter, see docs/ADAPTERS.md) or framework (--framework emitter).
+    validations:
+      required: true
+  - type: textarea
+    id: prior
+    attributes:
+      label: Prior art
+      description: How does this host load rules or skills, or what quarantine mechanism fits? One link is enough.
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Done looks like
+      options:
+        - label: New file(s) plus test in tests/
+        - label: Docs row or skill note updated

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="3" failures="1" errors="0" time="0.008802586">
+    <testsuite name="tests/add.test.js" timestamp="2026-09-12T05:45:58.069Z" hostname="lanman" tests="1" failures="0" errors="0" skipped="0" time="0.0020001">
+        <testcase classname="tests/add.test.js" name="adds" time="0.001166063">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/flaky.test.js" timestamp="2026-09-12T05:45:58.070Z" hostname="lanman" tests="2" failures="1" errors="0" skipped="0" time="0.006802486">
+        <testcase classname="tests/flaky.test.js" name="stable" time="0.001208425">
+        </testcase>
+        <testcase classname="tests/flaky.test.js" name="flaky counter" time="0.00454359">
+            <failure message="expected +0 to be 1 // Object.is equality" type="AssertionError">
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/flaky.test.js:15:47
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>

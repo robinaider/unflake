@@ -1,0 +1,5 @@
+{
+  "name": "unflake",
+  "description": "Green CI without the rerun ritual — detect, score, and quarantine flaky tests",
+  "version": "0.6.1"
+}

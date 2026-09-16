@@ -1,0 +1,9 @@
+# Dogfood: this repo lints itself with its own hook.
+repos:
+  - repo: local
+    hooks:
+      - id: unflake-scan
+        name: unflake flake scan
+        entry: python3 -m unflake scan src tests examples --fail-on error
+        language: system
+        pass_filenames: false

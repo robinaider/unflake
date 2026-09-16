@@ -1,0 +1,31 @@
+{
+  "name": "unflake-ci",
+  "version": "0.6.1",
+  "description": "Green CI without the rerun ritual \u2014 detect, score, and quarantine flaky tests (npx wrapper; needs Python 3.9+)",
+  "license": "MIT",
+  "bin": {
+    "unflake-ci": "bin/unflake-ci.js"
+  },
+  "files": [
+    "bin/",
+    "unflake_core/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "prepack": "python3 sync.py",
+    "sync": "python3 sync.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robinaider/unflake"
+  },
+  "keywords": [
+    "flaky-tests",
+    "testing",
+    "ci",
+    "qa",
+    "unflake"
+  ]
+}

@@ -1,0 +1,14 @@
+# Pre-commit hook: catch flake anti-patterns before they merge.
+# Usage (after `pip install unflake` is published; until then point
+# `rev` at a tag and keep `additional_dependencies` empty):
+#   - repo: https://github.com/robinaider/unflake
+#     rev: v0.6.1
+#     hooks:
+#       - id: unflake-scan
+- id: unflake-scan
+  name: unflake flake scan
+  entry: unflake scan
+  args: [--fail-on, warning]
+  language: python
+  files: '(test_|_test\.py$|\.spec\.[jt]sx?$|\.test\.[jt]sx?$|tests?/.*\.py$)'
+  pass_filenames: true

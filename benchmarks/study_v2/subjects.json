@@ -1,0 +1,56 @@
+[
+  {
+    "name": "freezegun-nod",
+    "repo": "https://github.com/spulec/freezegun.git",
+    "rev": "HEAD",
+    "deps": ["python-dateutil"],
+    "test_files": ["tests/test_class_import.py"],
+    "targets": ["tests/test_class_import.py::test_import_after_start"],
+    "runs": 10,
+    "notes": "IDoFT py-data.csv lists this as NOD+NIO. 2026-09-12: 10/10 stable at HEAD (likely fixed upstream). Keep: guards against regressions of the study itself."
+  },
+  {
+    "name": "vpype-rerun",
+    "repo": "https://github.com/abey79/vpype.git",
+    "rev": "HEAD",
+    "deps": ["pytest-rerunfailures"],
+    "test_files": ["tests/"],
+    "targets": ["tests/"],
+    "runs": 5,
+    "timeout": 280,
+    "notes": "Admits flakes (ships pytest-rerunfailures). 2026-09-12: BLOCKED locally — requires Python <3.14. Runs in CI matrix (3.11-3.13 jobs)."
+  },
+  {
+    "name": "requests-prospect",
+    "repo": "https://github.com/psf/requests.git",
+    "rev": "HEAD",
+    "deps": ["pytest-httpbin"],
+    "test_files": ["tests/test_testserver.py"],
+    "targets": ["tests/"],
+    "runs": 5,
+    "timeout": 280,
+    "notes": "Prospecting: network+timing heavy. 2026-09-12: 635 tests x5, FlakeScore 100 (healthy). Keep as specificity guard."
+  },
+  {
+    "name": "grabbit-nod",
+    "repo": "https://github.com/grabbles/grabbit.git",
+    "rev": "HEAD",
+    "deps": [],
+    "test_files": ["grabbit/tests/test_core.py"],
+    "targets": ["grabbit/tests/test_core.py"],
+    "runs": 5,
+    "timeout": 120,
+    "notes": "IDoFT NOD x5 ([local] file tests). 2026-09-12: 15 tests x10 stable at HEAD."
+  },
+  {
+    "name": "flask-jwt-nod",
+    "repo": "https://github.com/joegasewicz/Flask-JWT-Router.git",
+    "rev": "HEAD",
+    "deps": ["flask", "pyjwt", "sqlalchemy", "python-dateutil", "flask-sqlalchemy"],
+    "test_files": ["tests/test_routing.py"],
+    "targets": ["tests/test_routing.py"],
+    "runs": 5,
+    "timeout": 120,
+    "notes": "IDoFT NOD x9. 2026-09-12: 15 tests x10 stable at HEAD. Needs 4 test-only deps (see BENCH log)."
+  }
+]

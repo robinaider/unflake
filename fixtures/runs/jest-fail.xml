@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="2" failures="1" errors="0" time="0.159">
+  <testsuite name="undefined" errors="0" failures="1" skipped="0" timestamp="2026-09-12T05:50:50" time="0.079" tests="2">
+    <testcase classname=" stable" name=" stable" time="0.002">
+    </testcase>
+    <testcase classname=" flaky counter" name=" flaky counter" time="0.002">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 1
+Received: 0
+    at Object.toBe (/tmp/jest/proj/tests/flaky.test.js:13:47)
+    at Promise.finally.completed (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:1834:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:1774:10)
+    at _callCircusTest (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:1167:40)
+    at _runTestInContext (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:1103:3)
+    at runTestWithContext (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:996:5)
+    at _runTestsForDescribeBlockOnce (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:1008:11)
+    at _runTestsForDescribeBlock (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:824:5)
+    at run (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:789:3)
+    at runAndTransformResultsToJestFormat (/tmp/jest/proj/node_modules/jest-circus/build/jestAdapterInit.js:2300:21)
+    at jestAdapter (/tmp/jest/proj/node_modules/jest-circus/build/runner.js:111:19)
+    at runTestInternal (/tmp/jest/proj/node_modules/jest-runner/build/index.js:247:16)
+    at runTest (/tmp/jest/proj/node_modules/jest-runner/build/index.js:315:7)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
